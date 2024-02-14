@@ -23,7 +23,7 @@ updateForm.addEventListener("submit", async(event) =>
     const updateForm = document.querySelector('form')
     const formData = new FormData(updateForm)
 
-    const formDate = new Date(<string> formData.get('dateBulkStart')).toISOString()
+    const formDate = new Date(<string> formData.get('dateBulkStart')).toISOString().split('.')[0]+"Z"
     const formEmail = <string> formData.get('email')
     const formPassword = <string> formData.get('pass')
     console.log("script running")

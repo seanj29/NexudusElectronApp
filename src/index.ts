@@ -105,13 +105,11 @@ ipcMain.handle("GetFloorPlans", async (_, Auth) =>{
 ipcMain.handle("UpdateFloorPlan", async(_, record, Auth, date) =>{
 
     const url = "https://spaces.nexudus.com/api/sys/floorplandesks"
-    console.log(record)
-    console.log(date)
+    console.log({RecordAvailablePre: record.AvailableFromTime, Date: date, ID: record.Id})
 
     const data = {
-        AvailableToTime: date,
-        ...record
-
+        ...record,
+        AvailableFromTime: date,
                 }
 
     const options = {
@@ -128,6 +126,8 @@ ipcMain.handle("UpdateFloorPlan", async(_, record, Auth, date) =>{
     {   
         const response = await net.fetch(url, options)
         const json = await response.json()
+
+        console.log({StatusCode: json.Status, Message: json.Message, Value: json.Value, Success: json.WasSuccessful})
         return json
     }
     catch(err)
