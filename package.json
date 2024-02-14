@@ -1,0 +1,27 @@
+{
+  "name": "electronui",
+  "version": "1.0.0",
+  "description": "Test ui",
+  "main": "build/index.js",
+  "author": "Sean Otto",
+  "scripts": {
+    "build": "yarn webpack --config ./webpack.config.js && yarn run buildcss && copyfiles -f src/index.html build",
+    "start": "yarn run build && electron ./build",
+    "buildcss": "tailwindcss -i ./src/input.css -o ./build/output.css"
+  },
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "electron": "^28.2.1",
+    "html-webpack-plugin": "^5.6.0",
+    "tailwindcss": "^3.4.1",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.90.1",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "axios": "^1.6.7"
+  }
+}

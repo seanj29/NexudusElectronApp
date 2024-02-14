@@ -1,0 +1,13 @@
+{ 
+  "compilerOptions": {
+    "target": "es6",
+    "moduleResolution": "nodenext",
+    "module": "NodeNext",
+    "esModuleInterop": true,
+    "inlineSourceMap": true,
+    "outDir": "./build",
+    "preserveSymlinks": true,
+  },
+  "include": ["src/*.ts"],
+  "exclude": [ "node_modules", "build" ],
+}
