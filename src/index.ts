@@ -61,12 +61,20 @@ ipcMain.handle('Auth', async (_, email, pass) => {
 
 
      //     body: `grant_type=password&username=${encodeURIComponent("seanotto29@gmail.com")}&password=${encodeURIComponent("mnEc7yFn2nT3G$7")}`
-     
+
     try{
     const response = await net.fetch(url, options)
-    const json = await response.json()
+
+        try
+            {
+            const json = await response.json()
+            return json
+            }
+        catch(err){
+            console.error(err)
+            return response
+        }
     
-    return json
     }
     catch (err){
         console.error("Error: "+  err)

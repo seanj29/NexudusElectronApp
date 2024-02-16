@@ -1,7 +1,7 @@
 
 declare global {
 
-    interface Window { fetchRequest: {auth, getFloorPlans,  updateFloorPlan,}, floorPlans, Auth, TypeofAuth: string;}
+    interface Window { fetchRequest: {auth, getFloorPlans,  updateFloorPlan,}, floorPlans, Auth:string, Error}
 }
 
 
@@ -22,17 +22,29 @@ loginForm.addEventListener("submit", async(ev) =>
 
     window.Auth = await makeRequest(formEmail, formPassword)
     window.floorPlans = await getAllFloorPlanDesks(window.Auth)
+    const ErrorAlert = document.getElementById("errorAlert")
 
+    console.log(window.Auth)
+
+    if (!window.Auth){
+    ErrorAlert.setAttribute("class", "bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded")
+    const ErrorMessage = document.getElementById("errorMessage")
+    ErrorMessage.innerHTML = window.Error
+    }
+    else
+    {
     const loggedInDiv = createElement('div', "flex flex-col text-center space-y-4", "loggedIn")
-    const loginTitle = createElement('h1', 'text-4xl font-bold',"",window.TypeofAuth === 'Bearer' ? 'Logged in with Bearer Auth': "Maybe not logged in Idk, might use Basic Auth")
+    const loginTitle = createElement('h1', 'text-4xl font-bold',"",'Logged in')
     const amountofFloorplans = createElement('p',  "","",`There are ${window.floorPlans.length} floor plans in the space you are logged into`)
+
     loggedInDiv.appendChild(loginTitle)
     loggedInDiv.appendChild(amountofFloorplans)
-    loginForm.replaceWith(loggedInDiv)
 
+    ErrorAlert.setAttribute("class", "hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded")
+    loginForm.replaceWith(loggedInDiv)
     const updateForm = document.getElementById("updateForm")
     updateForm.setAttribute("class", "flex flex-col space-y-4 mt-4")
- 
+    }
 })
 
 const updateForm = document.getElementById("updateForm")
@@ -59,7 +71,7 @@ updateForm.addEventListener("submit", async (ev) =>{
 
     const successVsFailure = createElement("p", 'text-xl', 'successRate' ,`Out of ${window.floorPlans.length} floor plans ${floorPlanList.filter(Boolean).length} updated successfully`)
     const successRateExists = document.getElementById("successRate")
-    
+
     if (successRateExists) { 
         successRateExists.replaceWith(successVsFailure) 
     }
@@ -94,16 +106,16 @@ async function makeRequest(email: string, pass: string){
     const loginStatus = await authenticate(email, pass)
     if (loginStatus.access_token){
     console.log("Login successful")
+    window.Error = false
     auth = `Bearer ${loginStatus.access_token}`
-    window.TypeofAuth = 'Bearer'
+    return auth
     }
     else {
-        console.log("Login Failed, using Basic Auth")
-        console.error(loginStatus)
-        window.TypeofAuth = 'Basic'
+        console.log("Login Failed")
+        window.Error = loginStatus.error_description
+        return
     }
 
-    return auth
     
 }
 
