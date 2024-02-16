@@ -1,4 +1,4 @@
-import {app, net, BrowserWindow, ipcMain} from "electron"
+import {app, net, netLog, BrowserWindow, ipcMain} from "electron"
 import path from "path"
 
 
@@ -27,8 +27,9 @@ win.once('ready-to-show', () =>{
 
 const windowSize = {width: 1000, height: 900}
 
-app.whenReady().then(() =>{
+app.whenReady().then(async() =>{
     createWindow(windowSize)
+    await netLog.startLogging(path.join(__dirname, 'net-log.log'))
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) 
@@ -37,6 +38,10 @@ app.whenReady().then(() =>{
     
 })
 
+app.on('before-quit', async () =>{
+    const path = await netLog.stopLogging()
+    console.log('Net-logs written to', path)
+})
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit()
@@ -56,7 +61,7 @@ ipcMain.handle('Auth', async (_, email, pass) => {
 
 
      //     body: `grant_type=password&username=${encodeURIComponent("seanotto29@gmail.com")}&password=${encodeURIComponent("mnEc7yFn2nT3G$7")}`
-    // }
+     
     try{
     const response = await net.fetch(url, options)
     const json = await response.json()
@@ -87,12 +92,12 @@ ipcMain.handle("GetFloorPlans", async (_, Auth) =>{
         
         const floorPlansSearched = json.Records
         const idArray: number[] = []
-
         floorPlansSearched.forEach((floorPlan) => { 
             idArray.push(floorPlan.Id)
         })
-        const fullData = await net.fetch(`https://spaces.nexudus.com/api/sys/floorplandesks/?id[${idArray}]`, options)
+        const fullData = await net.fetch(`https://spaces.nexudus.com/api/sys/floorplandesks/?id[${idArray}]&page=1&size=500`, options)
         const dataJson = await fullData.json()
+        console.log('RECORDS', dataJson)
         return dataJson
         }
         catch (err){
@@ -105,7 +110,6 @@ ipcMain.handle("GetFloorPlans", async (_, Auth) =>{
 ipcMain.handle("UpdateFloorPlan", async(_, record, Auth, date) =>{
 
     const url = "https://spaces.nexudus.com/api/sys/floorplandesks"
-    console.log({RecordAvailablePre: record.AvailableFromTime, Date: date, ID: record.Id})
 
     const data = {
         ...record,
@@ -124,11 +128,24 @@ ipcMain.handle("UpdateFloorPlan", async(_, record, Auth, date) =>{
 
     try
     {   
-        const response = await net.fetch(url, options)
-        const json = await response.json()
+        let response = await net.fetch(url, options)
 
-        console.log({StatusCode: json.Status, Message: json.Message, Value: json.Value, Success: json.WasSuccessful})
+        if (response.status === 409 || response.status == 429){
+            let delay: number = parseInt(response.headers.get('retry-after') as string) * 1000;
+            await timeout(delay)
+            response = await net.fetch(url, options)
+        }
+        try
+        {
+        const json = await response.json()
+        // console.log({StatusCode: json.Status, Message: json.Message, Value: json.Value, Success: json.WasSuccessful})
         return json
+        }
+        catch(err){
+            console.error(err)
+            return response
+        }
+
     }
     catch(err)
     {
@@ -141,5 +158,8 @@ ipcMain.handle("UpdateFloorPlan", async(_, record, Auth, date) =>{
 })
 
 
-        
-       
+
+
+function timeout(time: number){
+    return new Promise(resolve => setTimeout(resolve, time));
+}

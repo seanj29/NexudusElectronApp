@@ -8,16 +8,19 @@
     <title>Bulk Import Extender</title>
   </head>
   <body>
-    <div>
-      <form class="h-screen flex flex-col items-center justify-center space-y-4 bg-blue-300" id="updateForm">
+    <div class ="h-screen flex flex-col items-center justify-center space-y-4 bg-blue-300" id="mainDiv">
+      <form class="flex flex-col space-y-4" id="loginForm">
         <label for="email">Please enter your email</label>
           <input type="email" name="email" id="email">
         <label for="password">Please enter your password</label>
           <input type="password" name="pass" id="password">
+          <input class="bg-slate-300 hover:bg-neutral-900 hover:text-white font-bold py-2 px-4 rounded-full mt-4" value="Login" type="submit">
+      </form> 
+      <form class="hidden flex-col space-y-4 mt-4" id="updateForm">
         <label for="dateLabel"> Input Bulk date:</label>
           <input type="date" id="date" name="dateBulkStart" value="2024-02-07" />
           <p></p>
-        <input class="bg-slate-300 hover:bg-neutral-900 hover:text-white font-bold py-2 px-4 rounded-full mt-4" value="Click here to Update in bulk" type="submit">
+        <input class="bg-slate-300 hover:bg-neutral-900 hover:text-white font-bold py-2 px-4 rounded-full" value="Click here to Update in bulk" type="submit">
       </form>
   </div>
   <script type= "module" src="./renderer.js"></script>
