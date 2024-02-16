@@ -2,18 +2,23 @@
   "name": "electronui",
   "version": "1.0.0",
   "description": "Test ui",
-  "main": "build/index.js",
+  "main": "index.js",
   "author": "Sean Otto",
   "scripts": {
     "build": "yarn webpack --config ./webpack.config.js && yarn run buildcss && copyfiles -f src/index.html build",
-    "start": "yarn run build && electron ./build",
-    "buildcss": "tailwindcss -i ./src/input.css -o ./build/output.css"
+    "pack": "yarn build && electron-builder --dir",
+    "dist": "electron-builder",
+    "start": "yarn build && electron ./build",
+    "buildcss": "tailwindcss -i ./src/input.css -o ./build/output.css",
+    "postinstall": "electron-builder install-app-deps"
   },
   "license": "MIT",
   "private": true,
   "devDependencies": {
+    "asar": "^3.2.0",
     "copyfiles": "^2.4.1",
-    "electron": "^28.2.1",
+    "electron": "^28.2.3",
+    "electron-builder": "^24.9.1",
     "html-webpack-plugin": "^5.6.0",
     "tailwindcss": "^3.4.1",
     "ts-loader": "^9.5.1",
@@ -21,7 +26,11 @@
     "webpack": "^5.90.1",
     "webpack-cli": "^5.1.4"
   },
-  "dependencies": {
-    "axios": "^1.6.7"
-  }
+  "build": {
+    "appId": "sean.MassUpdate",
+    "win": {
+      "target": "NSIS"
+    }
+  },
+  "dependencies": {}
 }
